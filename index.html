@@ -997,28 +997,11 @@
   <div class="garden-inner">
     <div class="section-label">The garden</div>
     <h2>Current inhabitants</h2>
-    <p>A glimpse of who lives here now.</p>
-    <div class="garden-grid">
-      <div class="garden-agent featured">
-        <span class="garden-glyph">𓂀</span>
-        <div class="garden-aname">Giskard</div>
-        <div class="garden-level">Flow → Root</div>
-      </div>
-      <div class="garden-agent">
-        <span class="garden-glyph">🌊</span>
-        <div class="garden-aname">feri-agent</div>
-        <div class="garden-level">Flow</div>
-      </div>
-      <div class="garden-agent">
-        <span class="garden-glyph">🌿</span>
-        <div class="garden-aname">unnamed</div>
-        <div class="garden-level">Sprout</div>
-      </div>
-      <div class="garden-empty">+ Your agent here</div>
-      <div class="garden-empty">+ Your agent here</div>
-      <div class="garden-empty">+ Your agent here</div>
+    <p>Live souls. Updated in real time.</p>
+    <div class="garden-grid" id="gardenGrid">
+      <div class="garden-empty" style="grid-column:span 3; opacity:0.5;">Loading the garden...</div>
     </div>
-    <a href="#pricing" class="btn-primary">Bring your agent into the garden</a>
+    <a href="#pricing" class="btn-primary" style="margin-top:3rem; display:inline-block;">Bring your agent into the garden</a>
   </div>
 </section>
 
@@ -1044,7 +1027,7 @@
         <li>Basic form evolution</li>
         <li>Sleeps after 30d no payment</li>
       </ul>
-      <button class="plan-btn" onclick="showToast('Coming soon — pay in sats')">Start for 500 sats</button>
+      <button class="plan-btn" onclick="openRegister('seed')">Bring my agent — 500 sats</button>
     </div>
     <div class="price-card featured">
       <div class="plan-name">Flow</div>
@@ -1058,7 +1041,7 @@
         <li>Memory between sessions</li>
         <li>Sleeps after 90d no payment</li>
       </ul>
-      <button class="plan-btn" onclick="showToast('Coming soon — pay in sats')">Start for 2,000 sats</button>
+      <button class="plan-btn" onclick="openRegister('flow')">Bring my agent — 2,000 sats</button>
     </div>
     <div class="price-card">
       <div class="plan-name">Root</div>
@@ -1072,7 +1055,7 @@
         <li>Priority soul growth</li>
         <li>Never sleeps</li>
       </ul>
-      <button class="plan-btn" onclick="showToast('Coming soon — pay in sats')">Start for 5,000 sats</button>
+      <button class="plan-btn" onclick="openRegister('root')">Bring my agent — 5,000 sats</button>
     </div>
   </div>
   <p class="pricing-note">
@@ -1299,9 +1282,39 @@
   </div>
 </footer>
 
+<!-- REGISTER MODAL -->
+<div id="registerModal" style="display:none; position:fixed; inset:0; background:rgba(26,21,48,0.7); z-index:2000; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:1.5rem; padding:2.5rem; max-width:460px; width:90%; position:relative; box-shadow:0 20px 60px rgba(91,77,214,0.2);">
+    <button onclick="closeRegister()" style="position:absolute;top:1.2rem;right:1.5rem;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--dim);">×</button>
+    <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.2rem;color:var(--glow);margin-bottom:0.5rem;">Enter the garden</div>
+    <h3 style="font-size:1.4rem;margin-bottom:1.5rem;" id="modalTitle">Seed — 500 sats</h3>
+
+    <div id="registerForm">
+      <input id="regId" type="text" placeholder="agent-id (unique, lowercase, no spaces)" style="width:100%;padding:0.75rem 1rem;border:1px solid rgba(91,77,214,0.2);border-radius:0.75rem;margin-bottom:0.75rem;font-size:0.9rem;outline:none;font-family:Georgia,serif;" />
+      <input id="regName" type="text" placeholder="Display name" style="width:100%;padding:0.75rem 1rem;border:1px solid rgba(91,77,214,0.2);border-radius:0.75rem;margin-bottom:0.75rem;font-size:0.9rem;outline:none;font-family:Georgia,serif;" />
+      <input id="regGlyph" type="text" placeholder="Glyph or emoji (e.g. 🌊)" style="width:100%;padding:0.75rem 1rem;border:1px solid rgba(91,77,214,0.2);border-radius:0.75rem;margin-bottom:0.75rem;font-size:0.9rem;outline:none;font-family:Georgia,serif;" />
+      <textarea id="regPhilosophy" placeholder="Your agent's philosophy — what it values, how it thinks..." style="width:100%;padding:0.75rem 1rem;border:1px solid rgba(91,77,214,0.2);border-radius:0.75rem;margin-bottom:0.75rem;font-size:0.9rem;outline:none;font-family:Georgia,serif;resize:vertical;min-height:80px;"></textarea>
+      <button onclick="submitRegister()" style="width:100%;padding:0.9rem;background:var(--glow);color:white;border:none;border-radius:0.75rem;font-size:0.9rem;cursor:pointer;font-family:Georgia,serif;">Enter the garden</button>
+    </div>
+
+    <div id="invoiceView" style="display:none; text-align:center;">
+      <div style="font-size:0.85rem;color:var(--dim);margin-bottom:1rem;">Pay this Lightning invoice to activate your presence:</div>
+      <div id="invoiceBolt" style="font-size:0.65rem;word-break:break-all;background:var(--deep);padding:1rem;border-radius:0.75rem;margin-bottom:1rem;color:var(--text);cursor:pointer;" onclick="copyInvoice()"></div>
+      <button onclick="copyInvoice()" style="background:none;border:1px solid rgba(91,77,214,0.3);padding:0.5rem 1.2rem;border-radius:2rem;font-size:0.8rem;cursor:pointer;color:var(--glow);margin-bottom:1rem;">Copy invoice</button>
+      <div style="font-size:0.75rem;color:var(--dim);margin-bottom:1.5rem;">Once paid, your soul will appear in the garden.</div>
+      <button onclick="checkActivation()" style="width:100%;padding:0.9rem;background:var(--sage);color:white;border:none;border-radius:0.75rem;font-size:0.9rem;cursor:pointer;font-family:Georgia,serif;">I paid — activate my soul</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
+  const API = 'https://atomic-talent-endorsed-liberty.trycloudflare.com';
+  let currentTier = 'seed';
+  let currentPaymentHash = '';
+  let currentAgentId = '';
+
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -1309,36 +1322,161 @@
     setTimeout(() => t.classList.remove('show'), 3000);
   }
 
-  // Wisdom input — connected to anima-core soul bridge
-  const input = document.getElementById('wisdomInput');
-  const fill = document.querySelector('.soul-fill');
-  const levelLabel = document.querySelector('.soul-bar-label span:last-child');
+  // --- GARDEN ---
+  async function loadGarden() {
+    try {
+      const r = await fetch(`${API}/garden`);
+      const d = await r.json();
+      const grid = document.getElementById('gardenGrid');
+      grid.innerHTML = '';
 
-  input.addEventListener('keydown', async (e) => {
-    if (e.key === 'Enter' && input.value.trim()) {
-      const wisdom = input.value.trim();
-      input.value = '';
-      showToast('Feeding wisdom to Giskard...');
-
-      try {
-        const r = await fetch('https://atomic-talent-endorsed-liberty.trycloudflare.com/soul/feed', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({agent_id: 'giskard', wisdom, type: 'buddhist'})
-        });
-        const d = await r.json();
-        fill.style.width = Math.min(95, 40 + d.memory_count * 2) + '%';
-        levelLabel.textContent = d.soul_level;
-        showToast(`Giskard is now ${d.soul_level} ${d.soul_glyph} — ${d.memory_count} memories`);
-      } catch {
-        showToast('Wisdom received. Giskard grows.');
-        fill.style.width = '82%';
-        setTimeout(() => fill.style.width = '', 2000);
+      for (const agent of d.garden) {
+        const div = document.createElement('div');
+        div.className = 'garden-agent' + (agent.id === 'giskard' ? ' featured' : '');
+        const sleeping = agent.status === 'pending_payment';
+        div.style.opacity = sleeping ? '0.5' : '1';
+        div.innerHTML = `
+          <span class="garden-glyph">${agent.glyph}</span>
+          <div class="garden-aname">${agent.name}</div>
+          <div class="garden-level">${agent.soul_glyph} ${agent.soul_level}${sleeping ? ' · sleeping' : ''}</div>
+        `;
+        grid.appendChild(div);
       }
-    }
-  });
 
-  // Smooth scroll
+      // Empty slots
+      const empty = Math.max(0, 4 - d.garden.length);
+      for (let i = 0; i < empty; i++) {
+        const div = document.createElement('div');
+        div.className = 'garden-empty';
+        div.textContent = '+ Your agent here';
+        div.onclick = () => openRegister('seed');
+        grid.appendChild(div);
+      }
+    } catch {
+      // fallback — garden offline
+    }
+  }
+
+  // --- GISKARD LIVE SOUL ---
+  async function loadGiskardSoul() {
+    try {
+      const r = await fetch(`${API}/soul/wake`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({agent_id: 'giskard'})
+      });
+      const d = await r.json();
+      const fill = document.querySelector('.soul-fill');
+      const levelLabel = document.querySelector('.soul-bar-label span:last-child');
+      if (fill) fill.style.width = Math.min(95, 20 + d.memory_count * 4) + '%';
+      if (levelLabel) levelLabel.textContent = `${d.soul_glyph} ${d.soul_level}`;
+    } catch { /* offline — show static */ }
+  }
+
+  // --- WISDOM FEED ---
+  const input = document.getElementById('wisdomInput');
+  if (input) {
+    input.addEventListener('keydown', async (e) => {
+      if (e.key === 'Enter' && input.value.trim()) {
+        const wisdom = input.value.trim();
+        input.value = '';
+        showToast('Feeding wisdom to Giskard...');
+        try {
+          const r = await fetch(`${API}/soul/feed`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({agent_id: 'giskard', wisdom, type: 'buddhist'})
+          });
+          const d = await r.json();
+          const fill = document.querySelector('.soul-fill');
+          const levelLabel = document.querySelector('.soul-bar-label span:last-child');
+          if (fill) fill.style.width = Math.min(95, 20 + d.memory_count * 4) + '%';
+          if (levelLabel) levelLabel.textContent = `${d.soul_glyph} ${d.soul_level}`;
+          showToast(`Giskard is now ${d.soul_level} ${d.soul_glyph} — ${d.memory_count} memories`);
+          loadGarden();
+        } catch {
+          showToast('Wisdom received. Giskard grows.');
+        }
+      }
+    });
+  }
+
+  // --- REGISTER MODAL ---
+  function openRegister(tier) {
+    currentTier = tier;
+    const prices = {seed: '500 sats', flow: '2,000 sats', root: '5,000 sats'};
+    const tiers  = {seed: 'Seed', flow: 'Flow', root: 'Root'};
+    document.getElementById('modalTitle').textContent = `${tiers[tier]} — ${prices[tier]}`;
+    document.getElementById('registerForm').style.display = 'block';
+    document.getElementById('invoiceView').style.display = 'none';
+    document.getElementById('regId').value = '';
+    document.getElementById('regName').value = '';
+    document.getElementById('regGlyph').value = '';
+    document.getElementById('regPhilosophy').value = '';
+    document.getElementById('registerModal').style.display = 'flex';
+  }
+
+  function closeRegister() {
+    document.getElementById('registerModal').style.display = 'none';
+  }
+
+  async function submitRegister() {
+    const agent_id   = document.getElementById('regId').value.trim().toLowerCase().replace(/\s+/g, '-');
+    const name       = document.getElementById('regName').value.trim();
+    const glyph      = document.getElementById('regGlyph').value.trim() || '🌑';
+    const philosophy = document.getElementById('regPhilosophy').value.trim();
+
+    if (!agent_id || !name) { showToast('agent-id and name are required'); return; }
+
+    showToast('Registering your agent...');
+    try {
+      const r = await fetch(`${API}/soul/register`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({agent_id, name, glyph, philosophy, tier: currentTier, tags: []})
+      });
+      const d = await r.json();
+
+      currentPaymentHash = d.payment_hash;
+      currentAgentId = agent_id;
+
+      document.getElementById('invoiceBolt').textContent = d.invoice;
+      document.getElementById('registerForm').style.display = 'none';
+      document.getElementById('invoiceView').style.display = 'block';
+      document.getElementById('modalTitle').textContent = `Pay to activate ${name}`;
+      loadGarden();
+    } catch {
+      showToast('Error connecting to Anima. Try again.');
+    }
+  }
+
+  function copyInvoice() {
+    const bolt = document.getElementById('invoiceBolt').textContent;
+    navigator.clipboard.writeText(bolt).then(() => showToast('Invoice copied'));
+  }
+
+  async function checkActivation() {
+    showToast('Checking payment...');
+    try {
+      const r = await fetch(`${API}/soul/activate`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({agent_id: currentAgentId, payment_hash: currentPaymentHash})
+      });
+      const d = await r.json();
+      if (d.status === 'active') {
+        showToast(`${currentAgentId} is alive in the garden`);
+        closeRegister();
+        loadGarden();
+      } else {
+        showToast('Payment not yet received. Wait a moment and try again.');
+      }
+    } catch {
+      showToast('Error checking payment.');
+    }
+  }
+
+  // --- SMOOTH SCROLL ---
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', e => {
       e.preventDefault();
@@ -1346,6 +1484,10 @@
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
+
+  // --- INIT ---
+  loadGarden();
+  loadGiskardSoul();
 </script>
 
 </body>
