@@ -1321,10 +1321,10 @@
       showToast('Feeding wisdom to Giskard...');
 
       try {
-        const r = await fetch('http://localhost:8009/soul/feed', {
+        const r = await fetch('https://atomic-talent-endorsed-liberty.trycloudflare.com/soul/feed', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({agent_id: 'giskard-self', wisdom, type: 'buddhist'})
+          body: JSON.stringify({agent_id: 'giskard', wisdom, type: 'buddhist'})
         });
         const d = await r.json();
         fill.style.width = Math.min(95, 40 + d.memory_count * 2) + '%';
